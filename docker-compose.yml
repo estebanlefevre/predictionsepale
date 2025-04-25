@@ -1,0 +1,54 @@
+services:
+  db:
+    image: postgres:latest
+    container_name: devcontainer-db-1
+    environment:
+      POSTGRES_USER: Esteban
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: mldb
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  api:
+    build: ./backend
+    image : estebanlefevre/monapi:latest
+    container_name: devcontainer-api
+    ports:
+      - "3030:3030"
+    environment:
+      - DB_USER=Esteban
+      - DB_HOST=db
+      - DB_NAME=mldb
+      - DB_PASSWORD=pass
+      - DB_PORT=5432
+    depends_on:
+      - db
+
+  frontend:
+    build: ./frontend
+    image: estebanlefevre/monfrontend:latest
+    container_name: devcontainer-react
+    ports:
+      - "5173:5173"
+
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v2.11.3
+    ports:
+      - "5000:5000"
+    environment:
+      MLFLOW_TRACKING_URI: http://localhost:5000
+    volumes:
+      - ./mlruns:/mlflow/mlruns
+      - ./backend:/appa
+    command: >
+      mlflow server
+      --host 0.0.0.0
+      --port 5000
+      --backend-store-uri sqlite:///mlflow.db
+      --default-artifact-root /mlflow/mlruns
+
+
+volumes:
+  db_data:
