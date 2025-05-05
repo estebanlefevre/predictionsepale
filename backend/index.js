@@ -3,7 +3,7 @@ const axios = require('axios');
 const app = express();
 const port = 3031;
 
-axios.get('http://mlflow:5000')
+axios.get('http://0.0.0.0:5000')
   .then(response => {
     console.log('MLflow is running:', response.data);  
   })
@@ -21,7 +21,7 @@ app.post('/predict', async (req, res) => {
       return res.status(400).send('La largeur du sépale doit être un nombre');
     }
 
-    const response = await axios.post('http://localhost:5000/invocations', {
+    const response = await axios.post('http://0.0.0.0:5000/invocations',{
     data: [[sepalWidth]],  
       dtype: 'float32',
     });

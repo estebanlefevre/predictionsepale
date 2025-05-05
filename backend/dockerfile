@@ -1,12 +1,10 @@
-FROM node:16
+FROM python:3.11-slim
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
-COPY package*.json ./
-RUN npm install
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-EXPOSE 5000
-
-CMD [ "node", "index.js" ]
+CMD ["python", "train_model.py"]

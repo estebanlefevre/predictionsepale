@@ -10,13 +10,25 @@ services:
       - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
+  mlflow:
+    image: ghcr.io/mlflow/mlflow
+    container_name: mlflow
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./mlruns:/mlflow/mlruns
+    environment:
+      - MLFLOW_BACKEND_STORE_URI=sqlite:///mlflow.db
+      - MLFLOW_DEFAULT_ARTIFACT_ROOT=/mlflow/mlruns
+    command: mlflow server --host 0.0.0.0 --port 5000 --backend-store-uri sqlite:///mlflow.db --default-artifact-root /mlflow/mlruns
+
 
   api:
     build: ./backend
     image : estebanlefevre/monapi:latest
     container_name: devcontainer-api
     ports:
-      - "3030:3030"
+      - "3031:3031"
     environment:
       - DB_USER=Esteban
       - DB_HOST=db
@@ -33,21 +45,16 @@ services:
     ports:
       - "5173:5173"
 
-  mlflow:
-    image: ghcr.io/mlflow/mlflow:v2.11.3
-    ports:
-      - "5000:5000"
-    environment:
-      MLFLOW_TRACKING_URI: http://localhost:5000
+  backend:
+    build: ./backend
+    container_name: backend
     volumes:
-      - ./mlruns:/mlflow/mlruns
-      - ./backend:/appa
-    command: >
-      mlflow server
-      --host 0.0.0.0
-      --port 5000
-      --backend-store-uri sqlite:///mlflow.db
-      --default-artifact-root /mlflow/mlruns
+      - ./backend:/app
+    environment:
+      - MLFLOW_TRACKING_URI=hhttp://0.0.0.0:5000
+    depends_on:
+      - mlflow
+
 
 
 volumes:

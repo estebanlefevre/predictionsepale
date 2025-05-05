@@ -20,7 +20,7 @@ y = df["sepal_length"]
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 # Configuration de MLflow
-mlflow.set_tracking_uri("http://localhost:5000")
+mlflow.set_tracking_uri("http://0.0.0.0:5000")
 mlflow.set_experiment("Prediction Sepale")
 
 # Chemin absolu du fichier
