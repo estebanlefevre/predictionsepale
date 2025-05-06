@@ -1,0 +1,15 @@
+# Dockerfile.api – pour FastAPI
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Dépendances
+COPY backend/requirements.txt .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copier les fichiers de l’API
+COPY backend /app/backend
+
+# Lancer l’API
+CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "3031", "--reload"]
