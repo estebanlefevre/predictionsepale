@@ -22,7 +22,7 @@ function App() {
     setLoading(true);
  
     try {
-      const res = await fetch("http://localhost:5000/predict", {
+      const res = await fetch("http://localhost:3031/predict", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sepal_width: parseFloat(sepalWidth) }),
@@ -35,6 +35,7 @@ function App() {
         setError(data.error || "Erreur serveur");
       }
     } catch {
+      console.log(error)
       setError("❌ Serveur injoignable.");
     } finally {
       setLoading(false);

@@ -1,8 +1,20 @@
 from fastapi import FastAPI
 import mlflow.pyfunc
 import pandas as pd
+from fastapi.middleware.cors import CORSMiddleware
+from typing import Dict
+
+
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # à adapter si besoin (mettre ["http://localhost:5173"] par ex.)
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 model = None
 
@@ -17,13 +29,15 @@ def load_model():
         model = None
 
 @app.post("/predict")
-def predict(features: dict):
-    if model is None:
-        return {"error": "Modèle non chargé"}
-
+def predict(input_data: Dict[str, float]):
     try:
-        df = pd.DataFrame([features])
-        prediction = model.predict(df)
-        return {"sepal_length_prediction": prediction[0]}
+        # Convertir explicitement toutes les valeurs en float
+        input_df = pd.DataFrame([{
+            key: float(value) for key, value in input_data.items()
+        }])
+
+        # Prédiction avec le modèle
+        prediction = model.predict(input_df)[0]
+        return {"prediction": prediction}
     except Exception as e:
-        return {"error": f"Erreur de prédiction : {str(e)}"}
+        return {"error": f"Erreur de prédiction : {e}"}
